@@ -14,7 +14,9 @@ namespace SimpleBackup
 {
     public static class Program
     {
-        // TODO - manual tests
+        // TODO - R# refactoring
+        // TODO - simple pipeline? (build test)
+        // TODO - sonar cloud private integration ?
 
         public static void Main()
         {
@@ -56,10 +58,13 @@ namespace SimpleBackup
                 .WriteTo.Console(
                     theme: SystemConsoleTheme.Colored,
                     outputTemplate: SeriLogTemplates.GetTemplate(simpleBackupConfiguration.LogMinimumLevel))
+                .WriteTo.Debug()
                 .CreateLogger());
 
             container.RegisterSingleton<IDateTimeService, DateTimeService>();
             container.RegisterSingleton<IFileSystemService, FileSystemService>();
+            container.RegisterSingleton<IZipWrapper, ZipWrapper>();
+            container.RegisterSingleton<IArchiveNameService, ArchiveNameService>();
 
             RegisterPipelineExecutorFactory(container);
             RegisterCompressorFactories(container);

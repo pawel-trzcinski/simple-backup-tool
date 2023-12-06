@@ -4,24 +4,28 @@ using SimpleBackup.Configuration;
 
 namespace SimpleBackup.Engine;
 
-public class Engine(ILogger log, SimpleBackupConfiguration configuration, Func<IPipelineExecutor> pipelineExecutorFactory)
+public class Engine(ILogger logger, SimpleBackupConfiguration configuration, Func<IPipelineExecutor> pipelineExecutorFactory)
     : IEngine
 {
-    // TODO - unit tests
-    
     public void Execute()
     {
-        log.Information($"{nameof(SimpleBackup)} started");
+        logger.Information($"{nameof(SimpleBackup)} started");
 
         foreach (BackupPipeline pipeline in configuration.BackupPipelines)
         {
+            if (!pipeline.Enabled)
+            {
+                logger.Information($"Pipeline {pipeline.Name} disabled");
+                continue;
+            }
+
             var stopwatch = Stopwatch.StartNew();
 
-            log.Information($"Started {pipeline.Name}");
+            logger.Information($"Started {pipeline.Name}");
             pipelineExecutorFactory().Execute(pipeline, configuration.TestRun);
 
             stopwatch.Stop();
-            log.Information($"Finished {pipeline.Name}. Elapsed: {stopwatch.Elapsed:g}");
+            logger.Information($"Finished {pipeline.Name}. Elapsed: {stopwatch.Elapsed:g}");
         }
     }
 }

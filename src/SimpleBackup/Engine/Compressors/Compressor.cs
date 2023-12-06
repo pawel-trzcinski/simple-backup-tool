@@ -4,20 +4,29 @@ using SimpleBackup.Configuration;
 
 namespace SimpleBackup.Engine.Compressors;
 
-public abstract class Compressor(ILogger logger, IFileSystemService fileSystemService, IDateTimeService dateTimeService) : ICompressor
+public abstract class Compressor(ILogger logger, IFileSystemService fileSystemService, IZipWrapper zipWrapper, IArchiveNameService archiveNameService) : ICompressor
 {
     // TODO - unit tests
 
-    private const string ARCHIVE = nameof(ARCHIVE);
     private const string ENTRY = nameof(ENTRY);
     private const string SOURCE = nameof(SOURCE);
-
+    
     public void Compress(BackupPipeline backupPipeline, bool testRun)
     {
-        // desFolder/name/Entry
+        // desFolder/Name/ARCHIVE_yyyy
+        // desFolder/mainFolder/archiveFolder
 
         string mainFolder = PrepareMainFolder(backupPipeline.BackupOutputFolder, backupPipeline.Name, testRun);
+
+        if (!testRun && !RefreshThresholdPassed(mainFolder, backupPipeline.RefreshThreshold))
+        {
+            logger.Information($"Refresh threshold not passed for {backupPipeline.Name}. Ignoring");
+            return;
+        }
+
         string archiveFolder = PrepareArchiveFolder(mainFolder, testRun);
+
+        logger.Information($"Compressing {backupPipeline.Name} into {archiveFolder}");
 
         int index = 0;
         foreach (string source in backupPipeline.Sources)
@@ -33,11 +42,39 @@ public abstract class Compressor(ILogger logger, IFileSystemService fileSystemSe
             {
                 CompressDirectory(fileSystemEntity, zipFile, backupPipeline.Compression, testRun);
             }
+
+            ++index;
+        }
+
+        logger.Information($"All sources compressed for archive {backupPipeline.Name}");
+        // TODO - manual test
+        fileSystemService.MoveDirectory(archiveFolder, $"{archiveFolder}.{IArchiveNameService.FINISHED}");
+
+        if (backupPipeline.RemoveOldArchive)
+        {
+            logger.Information("Removing old archives");
+            if (!testRun)
+            {
+                fileSystemService.RemoveAllDirectoriesExcept(mainFolder, archiveFolder);
+            }
         }
     }
 
-    protected abstract void CompressFile(FileSystemEntity fileSystemEntity, string zipFile, CompressionType compressionLevel, bool testRun);
-    protected abstract void CompressDirectory(FileSystemEntity fileSystemEntity, string zipFile, CompressionType compressionLevel, bool testRun);
+    private bool RefreshThresholdPassed(string mainFolder, TimeSpan threshold)
+    {
+        return archiveNameService.GetTimePassedFromLatesFinishedArchive(mainFolder) > threshold;
+    }
+
+    private void CompressFile(FileSystemEntity fileSystemEntity, string zipFile, CompressionType compressionType, bool testRun)
+    {
+        logger.Information($"Compressing file {fileSystemEntity.Source}");
+        if (!testRun)
+        {
+            zipWrapper.CompressFile(zipFile, fileSystemEntity.Source, CompressionLevelDiscoverer.Get(fileSystemEntity.Source, compressionType));
+        }
+    }
+
+    protected abstract void CompressDirectory(FileSystemEntity fileSystemEntity, string zipFile, CompressionType compressionType, bool testRun);
 
     private string PrepareMainFolder(string backupOutputFolder, string pipelineName, bool testRun)
     {
@@ -58,7 +95,7 @@ public abstract class Compressor(ILogger logger, IFileSystemService fileSystemSe
     /// <returns>Name of the destination zip file.</returns>
     private string PrepareArchiveFolder(string mainFolder, bool testRun)
     {
-        string archiveFolder = Path.Combine(mainFolder, $"{ARCHIVE}_{dateTimeService.Now:yyyy_MM_dd_HH_mm_ss}");
+        string archiveFolder = Path.Combine(mainFolder, archiveNameService.ConstructArchiveFolderName());
 
         if (fileSystemService.DirectoryExists(archiveFolder))
         {
@@ -84,13 +121,15 @@ public abstract class Compressor(ILogger logger, IFileSystemService fileSystemSe
             fileSystemService.CreateDirectory(entryFolder);
         }
 
-        string entrySourceIndicatorFile = Path.Combine(entryFolder, $"{fileSystemEntity.Name}.{SOURCE}");
+        string entityName = Path.GetFileName(fileSystemEntity.Source);
+
+        string entrySourceIndicatorFile = Path.Combine(entryFolder, $"{entityName}.{SOURCE}");
         logger.Information($"Creating entry source indicator file {entrySourceIndicatorFile}");
         if (!testRun)
         {
             fileSystemService.WriteTextToFile(entrySourceIndicatorFile, fileSystemEntity.Source);
         }
 
-        return Path.Combine(entryFolder, $"{fileSystemEntity.Name}.zip");
+        return Path.Combine(entryFolder, $"{entityName}.zip");
     }
 }

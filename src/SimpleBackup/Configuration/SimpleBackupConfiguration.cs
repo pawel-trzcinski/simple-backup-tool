@@ -4,8 +4,7 @@ namespace SimpleBackup.Configuration;
 
 public sealed class SimpleBackupConfiguration
 {
-    // TODO - document, with all possible values, enums etc
-    public IReadOnlyCollection<BackupPipeline> BackupPipelines { get; init; }
+    public IReadOnlyCollection<BackupPipeline> BackupPipelines { get; init; } = Array.Empty<BackupPipeline>();
 
     public LogEventLevel LogMinimumLevel { get; init; } = LogEventLevel.Information;
 

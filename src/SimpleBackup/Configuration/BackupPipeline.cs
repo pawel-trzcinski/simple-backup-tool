@@ -2,22 +2,28 @@
 
 public sealed class BackupPipeline
 {
-    public string Name { get; init; }
+    public string Name { get; init; } = String.Empty;
 
     public bool Enabled { get; init; }
+
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
+    public TimeSpan RefreshThreshold { get; init; }
 
     /// <summary>
     /// Collection of files or folders to be added to archive.
     /// </summary>
-    public IReadOnlyCollection<string> Sources { get; init; }
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
+    public IReadOnlyCollection<string> Sources { get; init; } = Array.Empty<string>();
 
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public CompressionType Compression { get; init; }
 
     /// <summary>
     /// Folder that backup will be saved to.
     /// </summary>
-    public string BackupOutputFolder { get; init; }
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
+    public string BackupOutputFolder { get; init; } = String.Empty;
 
-    // TODO - sprawdzamy top folder, czy są starsze pliki z tą samą nazwą albo z template
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public bool RemoveOldArchive { get; init; }
 }

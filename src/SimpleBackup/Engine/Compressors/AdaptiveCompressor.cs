@@ -6,21 +6,29 @@ namespace SimpleBackup.Engine.Compressors;
 
 public class AdaptiveCompressor : Compressor, IAdaptiveCompressor
 {
-    // TODO - unit tests
+    // TODO - manual test with real load
 
-    public AdaptiveCompressor(ILogger logger, IFileSystemService fileSystemService, IDateTimeService dateTimeService)
-        : base(logger, fileSystemService, dateTimeService)
+    private readonly IZipWrapper _zipWrapper;
+
+    public AdaptiveCompressor(ILogger logger, IFileSystemService fileSystemService, IZipWrapper zipWrapper, IArchiveNameService archiveNameService)
+        : base(logger, fileSystemService, zipWrapper, archiveNameService)
     // ReSharper disable once ConvertToPrimaryConstructor
     {
+        _zipWrapper = zipWrapper;
     }
 
-    protected override void CompressFile(FileSystemEntity fileSystemEntity, string zipFile, CompressionType compressionLevel, bool testRun)
+    protected override void CompressDirectory(FileSystemEntity fileSystemEntity, string zipFile, CompressionType compressionType, bool testRun)
     {
-        // TODO
-    }
+        if (compressionType != CompressionType.Adaptive)
+        {
+            throw new NotSupportedException($"{nameof(AdaptiveCompressor)} does not support  {nameof(CompressionType)}.{compressionType}");
+        }
 
-    protected override void CompressDirectory(FileSystemEntity fileSystemEntity, string zipFile, CompressionType compressionLevel, bool testRun)
-    {
-        // TODO
+        if (testRun)
+        {
+            return;
+        }
+
+        _zipWrapper.CompressDirectory(zipFile, fileSystemEntity.Source, file => CompressionLevelDiscoverer.Get(file, CompressionType.Adaptive));
     }
 }

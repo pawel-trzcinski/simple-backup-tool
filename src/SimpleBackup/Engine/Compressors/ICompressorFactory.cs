@@ -4,5 +4,5 @@ namespace SimpleBackup.Engine.Compressors;
 
 public interface ICompressorFactory
 {
-    ICompressor Create(CompressionType compressionLevel);
+    ICompressor Create(CompressionType compressionType);
 }

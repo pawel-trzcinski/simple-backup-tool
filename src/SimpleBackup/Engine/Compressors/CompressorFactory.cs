@@ -6,11 +6,9 @@ namespace SimpleBackup.Engine.Compressors;
 public class CompressorFactory(ILogger log, Func<IBasicCompressor> basicCompressorFactory, Func<IAdaptiveCompressor> adaptiveCompressorFactory)
     : ICompressorFactory
 {
-    // TODO - unit tests
-
-    public ICompressor Create(CompressionType compressionLevel)
+    public ICompressor Create(CompressionType compressionType)
     {
-        switch (compressionLevel)
+        switch (compressionType)
         {
             case CompressionType.Adaptive:
                 log.Information("Using adaptive compression.");
@@ -21,7 +19,7 @@ public class CompressorFactory(ILogger log, Func<IBasicCompressor> basicCompress
                 log.Information("Using basic compression.");
                 return basicCompressorFactory();
             default:
-                throw new ArgumentOutOfRangeException(nameof(compressionLevel), compressionLevel, null);
+                throw new ArgumentOutOfRangeException(nameof(compressionType), compressionType, null);
         }
     }
 }

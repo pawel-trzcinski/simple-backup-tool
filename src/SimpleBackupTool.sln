@@ -5,7 +5,13 @@ VisualStudioVersion = 17.8.34316.72
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleBackup", "SimpleBackup\SimpleBackup.csproj", "{1A90A3DC-8A0D-4C89-B186-F59941AB378D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleBackup.Tests", "SimpleBackup.Tests\SimpleBackup.Tests.csproj", "{9F436BED-F299-4138-80D0-64CB0255449F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleBackup.Tests", "SimpleBackup.Tests\SimpleBackup.Tests.csproj", "{9F436BED-F299-4138-80D0-64CB0255449F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A8671E9E-D773-4EDE-B3AE-577124DDCA4A}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,5 +1,4 @@
-﻿using System.IO.Compression;
-using Serilog;
+﻿using Serilog;
 using SimpleBackup.Abstractions;
 using SimpleBackup.Configuration;
 
@@ -8,43 +7,29 @@ namespace SimpleBackup.Engine.Compressors;
 public class BasicCompressor : Compressor, IBasicCompressor
 {
     private readonly ILogger _logger;
+    private readonly IZipWrapper _zipWrapper;
 
-    public BasicCompressor(ILogger logger, IFileSystemService fileSystemService, IDateTimeService dateTimeService)
-        : base(logger, fileSystemService, dateTimeService)
+    public BasicCompressor(ILogger logger, IFileSystemService fileSystemService, IZipWrapper zipWrapper, IArchiveNameService archiveNameService)
+        : base(logger, fileSystemService, zipWrapper, archiveNameService)
     // ReSharper disable once ConvertToPrimaryConstructor
     {
         _logger = logger;
-    }
-
-    protected override void CompressFile(FileSystemEntity fileSystemEntity, string zipFile, CompressionType compressionType, bool testRun)
-    {
-        if (compressionType == CompressionType.Adaptive)
-        {
-            throw new InvalidOperationException($"{nameof(BasicCompressor)} does not support  {nameof(CompressionType)}.{compressionType}");
-        }
-
-        _logger.Information($"Compressing file {fileSystemEntity.Source}");
-        if (!testRun)
-        {
-            using (var fileStream = new FileStream(zipFile, FileMode.Create))
-            using (var zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Create))
-            {
-                zipArchive.CreateEntryFromFile(fileSystemEntity.Source, fileSystemEntity.Name, CompressionLevelDiscoverer.Get(fileSystemEntity.Source, compressionType));
-            }
-        }
+        _zipWrapper = zipWrapper;
     }
 
     protected override void CompressDirectory(FileSystemEntity fileSystemEntity, string zipFile, CompressionType compressionType, bool testRun)
     {
         if (compressionType == CompressionType.Adaptive)
         {
-            throw new InvalidOperationException($"{nameof(BasicCompressor)} does not support  {nameof(CompressionType)}.{compressionType}");
+            throw new NotSupportedException($"{nameof(BasicCompressor)} does not support  {nameof(CompressionType)}.{compressionType}");
         }
 
         _logger.Information($"Compressing folder {fileSystemEntity.Source}");
-        if (!testRun)
+        if (testRun)
         {
-            ZipFile.CreateFromDirectory(fileSystemEntity.Source, zipFile, CompressionLevelDiscoverer.Get(fileSystemEntity.Source, compressionType), true);
+            return;
         }
+
+        _zipWrapper.CompressDirectory(zipFile, fileSystemEntity.Source, CompressionLevelDiscoverer.Get(fileSystemEntity.Source, compressionType));
     }
 }
