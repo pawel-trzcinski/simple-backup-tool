@@ -17,7 +17,7 @@ public class BasicCompressor : Compressor, IBasicCompressor
         _zipWrapper = zipWrapper;
     }
 
-    protected override void CompressDirectory(FileSystemEntity fileSystemEntity, string zipFile, CompressionType compressionType, bool testRun)
+    protected override void CompressDirectory(FileSystemEntity fileSystemEntity, string zipFile, CompressionType compressionType)
     {
         if (compressionType == CompressionType.Adaptive)
         {
@@ -25,11 +25,6 @@ public class BasicCompressor : Compressor, IBasicCompressor
         }
 
         _logger.Information($"Compressing folder {fileSystemEntity.Source}");
-        if (testRun)
-        {
-            return;
-        }
-
         _zipWrapper.CompressDirectory(zipFile, fileSystemEntity.Source, CompressionLevelDiscoverer.Get(fileSystemEntity.Source, compressionType));
     }
 }

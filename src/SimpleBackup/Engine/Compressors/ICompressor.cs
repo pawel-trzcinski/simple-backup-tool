@@ -4,5 +4,5 @@ namespace SimpleBackup.Engine.Compressors;
 
 public interface ICompressor
 {
-    void Compress(BackupPipeline backupPipeline, bool testRun);
+    void Compress(BackupPipeline backupPipeline);
 }

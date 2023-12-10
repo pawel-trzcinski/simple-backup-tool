@@ -15,14 +15,14 @@ public class BasicCompressorTests
     private sealed class BasicCompressorTester(IZipWrapper zipWrapper)
         : BasicCompressor(Substitute.For<ILogger>(), Substitute.For<IFileSystemService>(), zipWrapper, Substitute.For<IArchiveNameService>())
     {
-        public void CompressDirectoryExposed(FileSystemEntity fileSystemEntity, string zipFile, CompressionType compressionType, bool testRun)
+        public void CompressDirectoryExposed(FileSystemEntity fileSystemEntity, string zipFile, CompressionType compressionType)
         {
-            CompressDirectory(fileSystemEntity, zipFile, compressionType, testRun);
+            CompressDirectory(fileSystemEntity, zipFile, compressionType);
         }
     }
 
     [Test]
-    public void CompressionTypeMustNotBeAdaptive([Values] bool testRun)
+    public void CompressionTypeMustNotBeAdaptive()
     {
         // Arrange
         var fixture = new Fixture();
@@ -34,7 +34,7 @@ public class BasicCompressorTests
         var compressor = new BasicCompressorTester(zipWrapper);
 
         // Act, Assert
-        Assert.Throws<NotSupportedException>(() => compressor.CompressDirectoryExposed(fileSystemEntity, zipFile, CompressionType.Adaptive, testRun));
+        Assert.Throws<NotSupportedException>(() => compressor.CompressDirectoryExposed(fileSystemEntity, zipFile, CompressionType.Adaptive));
     }
 
     [TestCase(CompressionType.Best, CompressionLevel.SmallestSize)]
@@ -52,30 +52,9 @@ public class BasicCompressorTests
         var compressor = new BasicCompressorTester(zipWrapper);
 
         // Act
-        compressor.CompressDirectoryExposed(fileSystemEntity, zipFile, compressionType, false);
+        compressor.CompressDirectoryExposed(fileSystemEntity, zipFile, compressionType);
 
         // Assert
         zipWrapper.Received(1).CompressDirectory(zipFile, fileSystemEntity.Source, compressionLevel);
-    }
-
-    [TestCase(CompressionType.Best)]
-    [TestCase(CompressionType.Minimal)]
-    [TestCase(CompressionType.Normal)]
-    public void TestRunGuardWorks(CompressionType compressionType)
-    {
-        // Arrange
-        var fixture = new Fixture();
-        var fileSystemEntity = fixture.Create<FileSystemEntity>();
-        var zipFile = fixture.Create<string>();
-
-        var zipWrapper = Substitute.For<IZipWrapper>();
-
-        var compressor = new BasicCompressorTester(zipWrapper);
-
-        // Act
-        compressor.CompressDirectoryExposed(fileSystemEntity, zipFile, compressionType, true);
-
-        // Assert
-        zipWrapper.DidNotReceiveWithAnyArgs();
     }
 }

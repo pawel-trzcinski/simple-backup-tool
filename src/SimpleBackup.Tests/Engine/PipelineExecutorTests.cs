@@ -22,7 +22,7 @@ public class PipelineExecutorTests
     }
 
     [Test]
-    public void ExecutionPassesArguments([Values] bool testRun)
+    public void ExecutionPassesArguments()
     {
         // Arrange
         var fixture = new Fixture();
@@ -30,9 +30,9 @@ public class PipelineExecutorTests
         var executor = new PipelineExecutor(_compressorFactory);
 
         // Act
-        executor.Execute(pipeline, testRun);
+        executor.Execute(pipeline);
 
         // Assert
-        _compressor.Received(1).Compress(Arg.Is<BackupPipeline>(p => p.Name.Equals(pipeline.Name)), testRun);
+        _compressor.Received(1).Compress(Arg.Is<BackupPipeline>(p => p.Name.Equals(pipeline.Name)));
     }
 }

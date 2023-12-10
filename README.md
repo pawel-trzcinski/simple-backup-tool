@@ -23,8 +23,7 @@ Structure:
       ...
     ],
 
-    "LogMinimumLevel": "Information", ## Logger minimal verbosity level: Verbose, Debug, Information, Warning, Error, Fatal.
-    "TestRun": "false" ## Should data be changed.
+    "LogMinimumLevel": "Information" ## Logger minimal verbosity level: Verbose, Debug, Information, Warning, Error, Fatal.
   }
 }
 ```

@@ -22,10 +22,12 @@ public class Engine(ILogger logger, SimpleBackupConfiguration configuration, Fun
             var stopwatch = Stopwatch.StartNew();
 
             logger.Information($"Started {pipeline.Name}");
-            pipelineExecutorFactory().Execute(pipeline, configuration.TestRun);
+            pipelineExecutorFactory().Execute(pipeline);
 
             stopwatch.Stop();
             logger.Information($"Finished {pipeline.Name}. Elapsed: {stopwatch.Elapsed:g}");
         }
+
+        logger.Information("All pipelines finished.");
     }
 }

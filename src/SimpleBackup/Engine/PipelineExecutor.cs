@@ -5,8 +5,8 @@ namespace SimpleBackup.Engine;
 
 public class PipelineExecutor(ICompressorFactory compressorFactory) : IPipelineExecutor
 {
-    public void Execute(BackupPipeline backupPipeline, bool testRun)
+    public void Execute(BackupPipeline backupPipeline)
     {
-        compressorFactory.Create(backupPipeline.Compression).Compress(backupPipeline, testRun);
+        compressorFactory.Create(backupPipeline.Compression).Compress(backupPipeline);
     }
 }

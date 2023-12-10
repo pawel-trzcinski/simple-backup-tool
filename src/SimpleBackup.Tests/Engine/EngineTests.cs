@@ -27,7 +27,7 @@ namespace SimpleBackup.Tests.Engine
 
         [Test]
         [Combinatorial]
-        public void EnabledPipelinesExecuted([Values] bool testRun, [Range(0, VARIATION_MAX_INDEX)] int variationIndex)
+        public void EnabledPipelinesExecuted([Range(0, VARIATION_MAX_INDEX)] int variationIndex)
         {
             // Arrange
             var fixture = new Fixture();
@@ -35,7 +35,6 @@ namespace SimpleBackup.Tests.Engine
             int enabledCount = variation.Count(e => e);
             var configuration = new SimpleBackupConfiguration
             {
-                TestRun = testRun,
                 BackupPipelines = Enumerable.Range(0, PIPELINES_COUNT).Select(i =>
 
                     new BackupPipeline
@@ -56,7 +55,7 @@ namespace SimpleBackup.Tests.Engine
 
             // Assert
             _pipelineExecutorFactory.Received(enabledCount).Invoke();
-            executor.Received(enabledCount).Execute(Arg.Is<BackupPipeline>(p => configuration.BackupPipelines.Single(c => c.Name.Equals(p.Name)).Enabled), testRun);
+            executor.Received(enabledCount).Execute(Arg.Is<BackupPipeline>(p => configuration.BackupPipelines.Single(c => c.Name.Equals(p.Name)).Enabled));
         }
     }
 }

@@ -15,15 +15,15 @@ namespace SimpleBackup.Tests.Engine.Compressors
         private sealed class AdaptiveCompressorTester(IZipWrapper zipWrapper)
             : AdaptiveCompressor(Substitute.For<ILogger>(), Substitute.For<IFileSystemService>(), zipWrapper, Substitute.For<IArchiveNameService>())
         {
-            public void CompressDirectoryExposed(FileSystemEntity fileSystemEntity, string zipFile, CompressionType compressionType, bool testRun)
+            public void CompressDirectoryExposed(FileSystemEntity fileSystemEntity, string zipFile, CompressionType compressionType)
             {
-                CompressDirectory(fileSystemEntity, zipFile, compressionType, testRun);
+                CompressDirectory(fileSystemEntity, zipFile, compressionType);
             }
         }
 
         [Test]
         [Combinatorial]
-        public void CompressionTypeMustBeAdaptive([Values(CompressionType.Best, CompressionType.Minimal, CompressionType.Normal)] CompressionType compressionType, [Values] bool testRun)
+        public void CompressionTypeMustBeAdaptive([Values(CompressionType.Best, CompressionType.Minimal, CompressionType.Normal)] CompressionType compressionType)
         {
             // Arrange
             var fixture = new Fixture();
@@ -35,7 +35,7 @@ namespace SimpleBackup.Tests.Engine.Compressors
             var compressor = new AdaptiveCompressorTester(zipWrapper);
 
             // Act, Assert
-            Assert.Throws<NotSupportedException>(() => compressor.CompressDirectoryExposed(fileSystemEntity, zipFile, compressionType, testRun));
+            Assert.Throws<NotSupportedException>(() => compressor.CompressDirectoryExposed(fileSystemEntity, zipFile, compressionType));
         }
 
         [Test]
@@ -47,34 +47,15 @@ namespace SimpleBackup.Tests.Engine.Compressors
             var zipFile = fixture.Create<string>();
 
             var zipWrapper = Substitute.For<IZipWrapper>();
-           // zipWrapper.
+            // zipWrapper.
 
             var compressor = new AdaptiveCompressorTester(zipWrapper);
 
             // Act
-            compressor.CompressDirectoryExposed(fileSystemEntity, zipFile, CompressionType.Adaptive, false);
+            compressor.CompressDirectoryExposed(fileSystemEntity, zipFile, CompressionType.Adaptive);
 
             // Assert
             zipWrapper.Received(1).CompressDirectory(zipFile, fileSystemEntity.Source, Arg.Any<CompressionLevelFunc>());
-        }
-
-        [Test]
-        public void TestRunGuardWorks()
-        {
-            // Arrange
-            var fixture = new Fixture();
-            var fileSystemEntity = fixture.Create<FileSystemEntity>();
-            var zipFile = fixture.Create<string>();
-
-            var zipWrapper = Substitute.For<IZipWrapper>();
-
-            var compressor = new AdaptiveCompressorTester(zipWrapper);
-
-            // Act
-            compressor.CompressDirectoryExposed(fileSystemEntity, zipFile, CompressionType.Adaptive, true);
-
-            // Assert
-            zipWrapper.DidNotReceiveWithAnyArgs();
         }
     }
 }
