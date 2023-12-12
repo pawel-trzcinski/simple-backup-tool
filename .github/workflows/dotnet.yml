@@ -22,8 +22,9 @@ jobs:
         dotnet-version: 8.0.x
     - name: Change working directory
       run: 
-        pwd
-        cd src
+        pwd;
+        ls;
+        cd src;
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
