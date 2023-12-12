@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using JetBrains.Annotations;
+using Serilog;
 using SimpleBackup.Abstractions;
 using SimpleBackup.Configuration;
 
@@ -8,8 +9,9 @@ public class AdaptiveCompressor : Compressor, IAdaptiveCompressor
 {
     private readonly IZipWrapper _zipWrapper;
 
-    public AdaptiveCompressor(ILogger logger, IFileSystemService fileSystemService, IZipWrapper zipWrapper, IArchiveNameService archiveNameService)
-        : base(logger, fileSystemService, zipWrapper, archiveNameService)
+    [UsedImplicitly]
+    public AdaptiveCompressor(ILogger logger, IFileSystemService fileSystemService, IZipWrapper zipWrapper, IThresholdGuard thresholdGuard, IArchiveDiskManager archiveDiskManager)
+        : base(logger, fileSystemService, zipWrapper, thresholdGuard, archiveDiskManager)
     // ReSharper disable once ConvertToPrimaryConstructor
     {
         _zipWrapper = zipWrapper;

@@ -52,7 +52,7 @@ namespace SimpleBackup.Tests.Engine.Compressors
             var now4 = now + TimeSpan.FromSeconds(4);
             var now5 = now + TimeSpan.FromSeconds(5);
 
-            _dateTimeService.Now.Returns(now1, now2, now3, now4, now5, now);
+            _dateTimeService.Now.Returns(now, now1, now2, now3, now4, now5);
 
             var fileSystemService = new FileSystemService(Substitute.For<ILogger>());
             var mainFolderName = fixture.Create<string>();
@@ -73,7 +73,8 @@ namespace SimpleBackup.Tests.Engine.Compressors
                 TimeSpan timeSpan = service.GetTimePassedFromLatesFinishedArchive(mainFolder);
 
                 // Arrange
-                Assert.That((now3 - now).TotalSeconds, Is.EqualTo(3));
+                Assert.That(now2 - now, Is.LessThan(timeSpan));
+                Assert.That(now4 - now, Is.GreaterThan(timeSpan));
             }
             finally
             {

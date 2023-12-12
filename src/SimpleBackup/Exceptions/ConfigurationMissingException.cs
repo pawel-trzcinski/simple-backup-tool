@@ -1,9 +1,3 @@
 ﻿namespace SimpleBackup.Exceptions;
 
-public sealed class ConfigurationMissingException : Exception
-{
-    public ConfigurationMissingException()
-        : base("Configuration missing or invalid")
-    {
-    }
-}
+public sealed class ConfigurationMissingException() : Exception("Configuration missing or invalid");

@@ -13,7 +13,7 @@ namespace SimpleBackup.Tests.Engine.Compressors
     public class AdaptiveCompressorTests
     {
         private sealed class AdaptiveCompressorTester(IZipWrapper zipWrapper)
-            : AdaptiveCompressor(Substitute.For<ILogger>(), Substitute.For<IFileSystemService>(), zipWrapper, Substitute.For<IArchiveNameService>())
+            : AdaptiveCompressor(Substitute.For<ILogger>(), Substitute.For<IFileSystemService>(), zipWrapper, Substitute.For<IThresholdGuard>(), Substitute.For<IArchiveDiskManager>())
         {
             public void CompressDirectoryExposed(FileSystemEntity fileSystemEntity, string zipFile, CompressionType compressionType)
             {

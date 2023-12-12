@@ -14,10 +14,6 @@ namespace SimpleBackup
 {
     public static class Program
     {
-        // TODO - R# refactoring
-        // TODO - simple pipeline? (build test)
-        // TODO - sonar cloud private integration ?
-
         public static void Main()
         {
             Container? container = null;
@@ -65,6 +61,8 @@ namespace SimpleBackup
             container.RegisterSingleton<IFileSystemService, FileSystemService>();
             container.RegisterSingleton<IZipWrapper, ZipWrapper>();
             container.RegisterSingleton<IArchiveNameService, ArchiveNameService>();
+            container.RegisterSingleton<IArchiveDiskManager, ArchiveDiskManager>();
+            container.RegisterSingleton<IThresholdGuard, ThresholdGuard>();
 
             RegisterPipelineExecutorFactory(container);
             RegisterCompressorFactories(container);
