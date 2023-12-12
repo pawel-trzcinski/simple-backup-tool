@@ -14,17 +14,16 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: ./src
+
     steps:
     - uses: actions/checkout@v3
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
-    - name: Change working directory
-      run: 
-        pwd;
-        ls;
-        cd src;
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
